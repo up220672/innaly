@@ -1,0 +1,23 @@
+erDiagram
+    C_PAYMENT_METHOD {
+        uuid c_method_id PK
+        string c_name "credit_card|paypal|transfer"
+    }
+    
+    C_PAYMENT_STATUS {
+        uuid c_status_id PK
+        string c_name "pending|completed|refunded|failed"
+    }
+    
+    T_PAYMENT {
+        uuid t_payment_id PK
+        uuid t_booking_id "FK to Booking"
+        uuid c_method_id FK
+        uuid c_status_id FK
+        decimal t_amount
+        string t_transaction_id
+        timestamp t_processed_at
+    }
+    
+    C_PAYMENT_METHOD ||--o{ T_PAYMENT : "used_for"
+    C_PAYMENT_STATUS ||--o{ T_PAYMENT : "has"

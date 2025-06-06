@@ -49,7 +49,6 @@ flowchart TD
 
     subgraph Reporting["📊 Reporting Service"]
         REPORT_MS:::reporting
-        REPORT_DB[("Reporting DB")]:::db
     end
 
     %% ====== CONEXIONES COMPLETAS ======
@@ -78,4 +77,3 @@ flowchart TD
     ROOM_MS --> ROOM_DB
     BOOK_MS --> BOOK_DB
     PAY_MS --> PAY_DB
-    REPORT_MS --> REPORT_DB

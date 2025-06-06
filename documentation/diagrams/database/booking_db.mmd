@@ -1,0 +1,21 @@
+erDiagram
+    T_BOOKING {
+        uuid t_booking_id PK
+        uuid t_user_id "FK to Auth"
+        uuid t_room_id "FK to Room"
+        date t_check_in
+        date t_check_out
+        decimal t_total_price
+        string t_status "confirmed|cancelled|completed"
+        timestamp t_created_at
+    }
+    
+    T_GUEST {
+        uuid t_guest_id PK
+        uuid t_booking_id FK
+        string t_full_name
+        string t_email
+        string t_phone
+    }
+    
+    T_BOOKING ||--o{ T_GUEST : "has"

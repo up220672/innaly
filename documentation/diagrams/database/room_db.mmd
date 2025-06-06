@@ -1,0 +1,31 @@
+erDiagram
+    C_ROOM_TYPE {
+        uuid c_room_type_id PK
+        string c_name
+        decimal c_base_price
+        integer c_capacity
+    }
+    
+    C_AMENITY {
+        uuid c_amenity_id PK
+        string c_name
+        string c_icon_url
+    }
+    
+    T_ROOM {
+        uuid t_room_id PK
+        uuid c_room_type_id FK
+        string t_number
+        string t_status "available|maintenance"
+        timestamp t_created_at
+    }
+    
+    T_ROOM_TYPE_AMENITY {
+        uuid t_relation_id PK
+        uuid c_room_type_id FK
+        uuid c_amenity_id FK
+    }
+    
+    C_ROOM_TYPE ||--o{ T_ROOM : "contains"
+    C_ROOM_TYPE ||--|{ T_ROOM_TYPE_AMENITY : "has"
+    C_AMENITY ||--|{ T_ROOM_TYPE_AMENITY : "included_in"
