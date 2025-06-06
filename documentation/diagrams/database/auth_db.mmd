@@ -1,0 +1,47 @@
+erDiagram
+    %% ========= CATÁLOGOS =========
+    C_ROLE {
+        uuid c_role_id PK
+        string c_role_type "admin|staff|guest"
+    }
+
+    C_PERMISSION {
+        uuid c_permission_id PK
+        string c_permission_name
+    }
+
+    C_ROLE_PERMISSION {
+        uuid c_role_id FK
+        uuid c_permission_id FK
+    }
+
+    %% ========= USUARIOS =========
+    T_USER {
+        uuid t_user_id PK
+        string t_user_name
+        string t_user_last_name
+        string t_user_username
+        number t_user_phone
+        string t_user_password
+        uuid c_role_id FK
+        boolean t_user_status
+        timestamp t_user_created_at
+        timestamp t_user_updated_at
+    }
+
+    %% ========= CÓDIGOS TEMPORALES =========
+    T_USER_TEMPORARY_CODE {
+        uuid t_user_code_id PK
+        uuid t_user_id FK
+        string t_user_code_hash
+        string t_user_code_purpose "email_verification|password_reset"
+        timestamp t_user_code_expires_at
+        boolean t_user_code_used
+        timestamp t_user_code_created_at
+    }
+
+    %% ========= RELACIONES =========
+    C_ROLE ||--o{ T_USER : "has"
+    C_PERMISSION ||--o{ C_ROLE_PERMISSION : ""
+    C_ROLE ||--o{ C_ROLE_PERMISSION : ""
+    T_USER ||--o{ T_USER_TEMPORARY_CODE : "uses"
