@@ -1,0 +1,81 @@
+%%{init: {'theme': 'base', 'themeVariables': {
+    'primaryColor': '#f8f9fa',
+    'primaryBorderColor': '#ced4da',
+    'clusterBkg': '#f8f9fa',
+    'clusterBorder': '#dee2e6',
+    'fontFamily': 'Arial'
+}}}%%
+
+flowchart TD
+    %% ====== ESTILOS ======
+    classDef user fill:#E1F5FE,stroke:#4FC3F7,stroke-width:2px
+    classDef gateway fill:#FFF8E1,stroke:#FFD54F,stroke-width:2px
+    classDef auth fill:#FFEBEE,stroke:#EF9A9A
+    classDef room fill:#E8F5E9,stroke:#A5D6A7
+    classDef booking fill:#E3F2FD,stroke:#90CAF9
+    classDef payment fill:#F3E5F5,stroke:#CE93D8
+    classDef notification fill:#FFFDE7,stroke:#FFF59D
+    classDef reporting fill:#E0F7FA,stroke:#80DEEA
+    classDef db fill:#ECEFF1,stroke:#B0BEC5
+
+    %% ====== COMPONENTES PRINCIPALES ======
+    USER[Frontend]:::user
+    GW[API Gateway]:::gateway
+
+    %% ====== MICROSERVICIOS ======
+    subgraph Auth["🔐 Auth Service"]
+        AUTH_MS:::auth
+        AUTH_DB[("Auth DB")]:::db
+    end
+
+    subgraph Room["🛏️ Room Service"]
+        ROOM_MS:::room
+        ROOM_DB[("Room DB")]:::db
+    end
+
+    subgraph Booking["📅 Booking Service"]
+        BOOK_MS:::booking
+        BOOK_DB[("Booking DB")]:::db
+    end
+
+    subgraph Payment["💳 Payment Service"]
+        PAY_MS:::payment
+        PAY_DB[("Payment DB")]:::db
+    end
+
+    subgraph Notification["✉️ Notification Service"]
+        NOTIF_MS:::notification
+    end
+
+    subgraph Reporting["📊 Reporting Service"]
+        REPORT_MS:::reporting
+        REPORT_DB[("Reporting DB")]:::db
+    end
+
+    %% ====== CONEXIONES COMPLETAS ======
+    USER -->|HTTPS| GW
+
+    %% Gateway → Microservicios
+    GW -->|POST /auth/*| AUTH_MS
+    GW -->|GET /rooms| ROOM_MS
+    GW -->|POST /bookings| BOOK_MS
+
+    %% Booking Service
+    BOOK_MS -->|Check availability| ROOM_MS
+    BOOK_MS -->|Process payment| PAY_MS
+    BOOK_MS -->|Send confirmation| NOTIF_MS
+    BOOK_MS -->|Record metrics| REPORT_MS
+
+    %% Reporting
+    REPORT_MS -->|Get bookings| BOOK_MS
+    REPORT_MS -->|Get room data| ROOM_MS
+
+    %% Notification
+    NOTIF_MS -->|Get user details| AUTH_MS
+
+    %% Bases de datos
+    AUTH_MS --> AUTH_DB
+    ROOM_MS --> ROOM_DB
+    BOOK_MS --> BOOK_DB
+    PAY_MS --> PAY_DB
+    REPORT_MS --> REPORT_DB
