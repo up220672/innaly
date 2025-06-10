@@ -30,8 +30,6 @@ flowchart TD
         ROOM_C["🛏️ Room Service Container"]:::service_c
         BOOK_C["📅 Booking Service Container"]:::service_c
         PAY_C["💳 Payment Service Container"]:::service_c
-        NOTIF_C["✉️ Notification Service Container"]:::service_c
-        REPORT_C["📊 Reporting Service Container"]:::service_c
     end
 
     subgraph Bases de Datos
@@ -53,15 +51,9 @@ flowchart TD
     %% Comunicación interna entre Microservicios
     BOOK_C -->|HTTP| ROOM_C
     BOOK_C -->|HTTP| PAY_C
-    BOOK_C -->|HTTP| NOTIF_C
-    BOOK_C -->|HTTP| REPORT_C
     BOOK_C -->|HTTP| GUEST_C
     GUEST_C -->|HTTP| AUTH_C
     PAY_C -->|HTTP| BOOK_C
-    REPORT_C -->|HTTP| BOOK_C
-    REPORT_C -->|HTTP| ROOM_C
-    REPORT_C -->|HTTP| PAY_C
-    NOTIF_C -->|HTTP| AUTH_C
 
     %% Contenedores de Servicio → Base de Datos
     AUTH_C -->|SQL| MYSQL_DB_C
