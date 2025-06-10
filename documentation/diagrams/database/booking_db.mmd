@@ -1,21 +1,48 @@
 erDiagram
+    %% ========= CATÁLOGOS =========
+    C_BOOKING_SOURCE {
+        uuid c_booking_source_id PK
+        string c_booking_source_name "website|reception"
+    }
+
+    C_BOOKING_STATUS {
+        uuid c_booking_status_id PK
+        string c_booking_status_name "pending|confirmed|cancelled|completed|no_show"
+    }
+
+    %% ========= TRANSACCIONALES =========
     T_BOOKING {
         uuid t_booking_id PK
-        uuid t_user_id "FK to Auth"
-        uuid t_room_id "FK to Room"
+        uuid t_guest_id FK
+        uuid c_booking_source_id FK
+        uuid c_booking_status_id FK
+        timestamp t_booking_created_at
+        timestamp t_booking_updated_at
+    }
+
+    T_BOOKING_DETAIL {
+        uuid t_booking_detail_id PK
+        uuid t_booking_id FK
+        uuid t_room_id FK
         date t_check_in
         date t_check_out
-        decimal t_total_price
-        string t_status "confirmed|cancelled|completed"
-        timestamp t_created_at
+        decimal t_nightly_price
+        integer t_adult_count
+        integer t_child_count
+        text t_special_requests
     }
-    
-    T_GUEST {
-        uuid t_guest_id PK
+
+    T_BOOKING_HISTORY {
+        uuid t_history_id PK
         uuid t_booking_id FK
-        string t_full_name
-        string t_email
-        string t_phone
+        uuid t_staff_id FK "nullable (cambios por staff)"
+        string t_action "created|modified|cancelled|status_change"
+        string t_action_details
+        timestamp t_action_time
     }
-    
-    T_BOOKING ||--o{ T_GUEST : "has"
+
+    %% ========= RELACIONES =========
+    T_BOOKING ||--o{ T_BOOKING_DETAIL : "has_details"
+    T_BOOKING ||--o{ T_BOOKING_HISTORY : "has_history"
+    C_BOOKING_SOURCE ||--o{ T_BOOKING : "has_source"
+    C_BOOKING_STATUS ||--o{ T_BOOKING : "has_status"
