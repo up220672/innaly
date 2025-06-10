@@ -1,0 +1,143 @@
+# Admin     :  root
+# Password  :  root
+
+services:
+  innaly-mysql:
+    image: mysql:8.0
+    container_name: innaly-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./database:/var/lib/mysql
+    networks:
+      - innaly-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: innaly-phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: innaly-mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "8081:80"
+    depends_on:
+      - innaly-mysql
+    networks:
+      - innaly-network
+
+  frontend:
+    image: node:20
+    container_name: innaly-frontend
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:5173"
+    depends_on:
+      - innaly-mysql
+    networks:
+      - innaly-network
+
+  apigateway:
+    image: node:20
+    container_name: innaly-apigateway
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    volumes:
+      - ./microservices/APIGatewayService:/app
+      - /app/node_modules
+    ports:
+      - "3001:3000"
+    depends_on:
+      - innaly-mysql
+    networks:
+      - innaly-network
+
+  auth-service:
+    image: node:20
+    container_name: innaly-authservice
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    volumes:
+      - ./microservices/AuthService:/app
+      - /app/node_modules
+    ports:
+      - "3002:3000"
+    depends_on:
+      - innaly-mysql
+    networks:
+      - innaly-network
+  
+  guest-service:
+    image: node:20
+    container_name: innaly-guestservice
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    volumes:
+      - ./microservices/GuestService:/app
+      - /app/node_modules
+    ports:
+      - "3003:3000"
+    depends_on:
+      - innaly-mysql
+    networks:
+      - innaly-network
+  
+  booking-service:
+    image: node:20
+    container_name: innaly-bookingservice
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    volumes:
+      - ./microservices/BookingService:/app
+      - /app/node_modules
+    ports:
+      - "3004:3000"
+    depends_on:
+      - innaly-mysql
+    networks:
+      - innaly-network
+  
+  room-service:
+    image: node:20
+    container_name: innaly-roomservice
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    volumes:
+      - ./microservices/RoomService:/app
+      - /app/node_modules
+    ports:
+      - "3005:3000"
+    depends_on:
+      - innaly-mysql
+    networks:
+      - innaly-network
+  
+  payment-service:
+    image: node:20
+    container_name: innaly-paymentservice
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    volumes:
+      - ./microservices/PaymentService:/app
+      - /app/node_modules
+    ports:
+      - "3006:3000"
+    depends_on:
+      - innaly-mysql
+    networks:
+      - innaly-network
+
+volumes:
+  database:
+
+networks:
+  innaly-network:
+    driver: bridge
