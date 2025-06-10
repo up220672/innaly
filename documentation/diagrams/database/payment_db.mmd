@@ -1,23 +1,54 @@
 erDiagram
+    %% ========= CATÁLOGOS =========
     C_PAYMENT_METHOD {
-        uuid c_method_id PK
-        string c_name "credit_card|paypal|transfer"
+        uuid c_payment_method_id PK
+        string c_payment_method_name "credit_card|paypal|transfer|cash"
     }
-    
+
     C_PAYMENT_STATUS {
-        uuid c_status_id PK
-        string c_name "pending|completed|refunded|failed"
+        uuid c_payment_status_id PK
+        string c_payment_status_name "pending|completed|refunded|failed|partially_refunded"
     }
-    
+
+    %% ========= TRANSACCIONALES =========
     T_PAYMENT {
         uuid t_payment_id PK
-        uuid t_booking_id "FK to Booking"
-        uuid c_method_id FK
-        uuid c_status_id FK
-        decimal t_amount
-        string t_transaction_id
-        timestamp t_processed_at
+        uuid t_booking_id FK
+        uuid c_payment_method_id FK
+        uuid c_payment_status_id FK
+        decimal t_payment_amount
+        string t_payment_transaction_id
+        timestamp t_payment_processed_at
     }
-    
+
+    T_PAYMENT_DETAIL {
+        uuid t_payment_detail_id PK
+        uuid t_payment_id FK
+        decimal t_room_charges
+        decimal t_tax_amount
+        decimal t_service_fee
+        decimal t_other_charges
+    }
+
+    T_REFUND {
+        uuid t_refund_id PK
+        uuid t_payment_id FK
+        decimal t_refund_amount
+        string t_refund_reason
+        timestamp t_refund_processed_at
+    }
+
+    T_INVOICE {
+        uuid t_invoice_id PK
+        uuid t_payment_id FK
+        string t_invoice_number
+        string t_invoice_details
+        timestamp t_invoice_issued_at
+    }
+
+    %% ========= RELACIONES =========
     C_PAYMENT_METHOD ||--o{ T_PAYMENT : "used_for"
-    C_PAYMENT_STATUS ||--o{ T_PAYMENT : "has"
+    C_PAYMENT_STATUS ||--o{ T_PAYMENT : "has_status"
+    T_PAYMENT ||--o{ T_PAYMENT_DETAIL : "has_details"
+    T_PAYMENT ||--o{ T_REFUND : "has_refunds"
+    T_PAYMENT ||--o{ T_INVOICE : "generates"
