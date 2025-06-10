@@ -1,0 +1,49 @@
+erDiagram
+    %% ========= CATÁLOGOS =========
+    C_IDENTIFICATION_TYPE {
+        uuid c_id_type_id PK
+        string c_id_type_name "passport|driver_license|national_id"
+    }
+
+    C_COUNTRY {
+        uuid c_country_id PK
+        string c_country_name
+        string c_country_code
+    }
+
+    %% ========= HUÉSPEDES =========
+    T_GUEST {
+        uuid t_guest_id PK
+        string t_guest_first_name
+        string t_guest_last_name
+        string t_guest_email
+        string t_guest_phone
+        date t_guest_birthdate
+        uuid c_country_id FK
+        timestamp t_guest_created_at
+    }
+
+    T_GUEST_IDENTIFICATION {
+        uuid t_guest_id_id PK
+        uuid t_guest_id FK
+        uuid c_id_type_id FK
+        string t_id_number
+        string t_id_image_url
+        date t_id_expiration_date
+    }
+
+    T_GUEST_ADDRESS {
+        uuid t_address_id PK
+        uuid t_guest_id FK
+        string t_address_street
+        string t_address_city
+        string t_address_state
+        string t_address_postal_code
+        string t_address_country
+    }
+
+    %% ========= RELACIONES =========
+    T_GUEST ||--o{ T_GUEST_IDENTIFICATION : "has_identification"
+    T_GUEST ||--o{ T_GUEST_ADDRESS : "has_address"
+    C_IDENTIFICATION_TYPE ||--o{ T_GUEST_IDENTIFICATION : "is_type"
+    C_COUNTRY ||--o{ T_GUEST : "from_country"
