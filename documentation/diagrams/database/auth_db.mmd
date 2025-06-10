@@ -2,7 +2,7 @@ erDiagram
     %% ========= CATÁLOGOS =========
     C_ROLE {
         uuid c_role_id PK
-        string c_role_type "admin|staff|guest"
+        string c_role_type "admin|receptionist|manager"
     }
 
     C_PERMISSION {
@@ -15,33 +15,30 @@ erDiagram
         uuid c_permission_id FK
     }
 
-    %% ========= USUARIOS =========
-    T_USER {
-        uuid t_user_id PK
-        string t_user_name
-        string t_user_last_name
-        string t_user_username
-        number t_user_phone
-        string t_user_password
+    %% ========= USUARIOS (STAFF) =========
+    T_STAFF {
+        uuid t_staff_id PK
+        string t_staff_name
+        string t_staff_last_name
+        string t_staff_email
+        string t_staff_phone
+        string t_staff_password
         uuid c_role_id FK
-        boolean t_user_status
-        timestamp t_user_created_at
-        timestamp t_user_updated_at
+        boolean t_staff_status
+        timestamp t_staff_created_at
+        timestamp t_staff_updated_at
     }
 
-    %% ========= CÓDIGOS TEMPORALES =========
-    T_USER_TEMPORARY_CODE {
-        uuid t_user_code_id PK
-        uuid t_user_id FK
-        string t_user_code_hash
-        string t_user_code_purpose "email_verification|password_reset"
-        timestamp t_user_code_expires_at
-        boolean t_user_code_used
-        timestamp t_user_code_created_at
+    T_STAFF_LOGIN_HISTORY {
+        uuid t_login_id PK
+        uuid t_staff_id FK
+        timestamp t_login_time
+        string t_login_ip
+        boolean t_login_success
     }
 
     %% ========= RELACIONES =========
-    C_ROLE ||--o{ T_USER : "has"
+    C_ROLE ||--o{ T_STAFF : "has"
     C_PERMISSION ||--o{ C_ROLE_PERMISSION : ""
     C_ROLE ||--o{ C_ROLE_PERMISSION : ""
-    T_USER ||--o{ T_USER_TEMPORARY_CODE : "uses"
+    T_STAFF ||--o{ T_STAFF_LOGIN_HISTORY : "has"
