@@ -1,0 +1,74 @@
+%%{init: {'theme': 'base', 'themeVariables': {
+    'primaryColor': '#f8f9fa',
+    'primaryBorderColor': '#ced4da',
+    'clusterBkg': '#f8f9fa',
+    'clusterBorder': '#dee2e6',
+    'fontFamily': 'Arial'
+}}}%%
+
+flowchart TD
+    %% ====== ESTILOS ======
+    classDef frontend_c fill:#E1F5FE,stroke:#4FC3F7,stroke-width:2px
+    classDef gateway_c fill:#FFF8E1,stroke:#FFD54F,stroke-width:2px
+    classDef service_c fill:#FFE0F0,stroke:#F48FB1,stroke-width:2px
+    classDef db_c fill:#BBDEFB,stroke:#64B5F6,stroke-width:2px
+    classDef admin_tool_c fill:#E0F2F7,stroke:#81D4FA
+    classDef client_c fill:#F1F8E9,stroke:#8BC34A,stroke-width:2px
+
+    %% ====== CONTENEDORES ======
+    GW_C["API Gateway Container"]:::gateway_c
+
+    CLIENT_HOST_C["🖥️ Client Host"]:::client_c
+
+    subgraph Frontend
+        FRONTEND_C["🌐 Frontend Container"]:::frontend_c
+    end
+
+    subgraph Microservicios
+        AUTH_C["🔐 Auth Service Container"]:::service_c
+        GUEST_C["🧑‍💼 Guest Service Container"]:::service_c
+        ROOM_C["🛏️ Room Service Container"]:::service_c
+        BOOK_C["📅 Booking Service Container"]:::service_c
+        PAY_C["💳 Payment Service Container"]:::service_c
+        NOTIF_C["✉️ Notification Service Container"]:::service_c
+        REPORT_C["📊 Reporting Service Container"]:::service_c
+    end
+
+    subgraph Bases de Datos
+        MYSQL_DB_C["MySQL Database Container"]:::db_c
+        PHPMYADMIN_C["phpMyAdmin Container"]:::admin_tool_c
+    end
+
+    %% ====== CONEXIONES ENTRE CONTENEDORES ======
+    CLIENT_HOST_C -->|HTTPS| FRONTEND_C
+    FRONTEND_C -->|HTTPS| GW_C
+
+    %% Gateway → Microservicios
+    GW_C -->|HTTP| AUTH_C
+    GW_C -->|HTTP| GUEST_C
+    GW_C -->|HTTP| ROOM_C
+    GW_C -->|HTTP| BOOK_C
+    GW_C -->|HTTP| PAY_C
+
+    %% Comunicación interna entre Microservicios
+    BOOK_C -->|HTTP| ROOM_C
+    BOOK_C -->|HTTP| PAY_C
+    BOOK_C -->|HTTP| NOTIF_C
+    BOOK_C -->|HTTP| REPORT_C
+    BOOK_C -->|HTTP| GUEST_C
+    GUEST_C -->|HTTP| AUTH_C
+    PAY_C -->|HTTP| BOOK_C
+    REPORT_C -->|HTTP| BOOK_C
+    REPORT_C -->|HTTP| ROOM_C
+    REPORT_C -->|HTTP| PAY_C
+    NOTIF_C -->|HTTP| AUTH_C
+
+    %% Contenedores de Servicio → Base de Datos
+    AUTH_C -->|SQL| MYSQL_DB_C
+    GUEST_C -->|SQL| MYSQL_DB_C
+    ROOM_C -->|SQL| MYSQL_DB_C
+    BOOK_C -->|SQL| MYSQL_DB_C
+    PAY_C -->|SQL| MYSQL_DB_C
+
+    %% phpMyAdmin → Base de Datos
+    PHPMYADMIN_C -->|SQL| MYSQL_DB_C
