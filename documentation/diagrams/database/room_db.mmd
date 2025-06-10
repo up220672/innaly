@@ -1,31 +1,60 @@
 erDiagram
+    %% ========= CATÁLOGOS =========
     C_ROOM_TYPE {
         uuid c_room_type_id PK
-        string c_name
-        decimal c_base_price
-        integer c_capacity
+        string c_room_type_name
+        decimal c_room_type_base_price
+        integer c_room_type_capacity
+        text c_room_type_description
     }
-    
+
     C_AMENITY {
         uuid c_amenity_id PK
-        string c_name
-        string c_icon_url
+        string c_amenity_name
     }
-    
+
+    C_ROOM_STATUS {
+        uuid c_room_status_id PK
+        string c_room_status_name "available|occupied|maintenance|cleaning"
+    }
+
+    %% ========= TRANSACCIONALES =========
     T_ROOM {
         uuid t_room_id PK
         uuid c_room_type_id FK
-        string t_number
-        string t_status "available|maintenance"
-        timestamp t_created_at
+        uuid c_room_status_id FK
+        string t_room_number
+        integer t_room_floor
+        timestamp t_room_created_at
     }
-    
+
     T_ROOM_TYPE_AMENITY {
-        uuid t_relation_id PK
+        uuid t_room_type_amenity_id PK
         uuid c_room_type_id FK
         uuid c_amenity_id FK
     }
-    
-    C_ROOM_TYPE ||--o{ T_ROOM : "contains"
-    C_ROOM_TYPE ||--|{ T_ROOM_TYPE_AMENITY : "has"
-    C_AMENITY ||--|{ T_ROOM_TYPE_AMENITY : "included_in"
+
+    T_ROOM_IMAGE {
+        uuid t_room_image_id PK
+        uuid c_room_type_id FK
+        string t_image_url
+        integer t_image_order
+        boolean t_is_primary
+    }
+
+    T_ROOM_MAINTENANCE {
+        uuid t_maintenance_id PK
+        uuid t_room_id FK
+        string t_maintenance_reason
+        timestamp t_maintenance_start
+        timestamp t_maintenance_end
+        string t_maintenance_status "scheduled|in_progress|completed"
+    }
+
+    %% ========= RELACIONES =========
+    C_ROOM_TYPE ||--o{ T_ROOM : "has"
+    C_ROOM_TYPE ||--o{ T_ROOM_TYPE_AMENITY : "has"
+    C_AMENITY ||--o{ T_ROOM_TYPE_AMENITY : "included_in"
+    C_ROOM_STATUS ||--o{ T_ROOM : "has_status"
+    C_ROOM_TYPE ||--o{ T_ROOM_IMAGE : "has_images"
+    T_ROOM ||--o{ T_ROOM_MAINTENANCE : "has_maintenance"
