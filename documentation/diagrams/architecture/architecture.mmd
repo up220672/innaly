@@ -16,6 +16,7 @@ flowchart TD
     classDef payment fill:#F3E5F5,stroke:#CE93D8
     classDef notification fill:#FFFDE7,stroke:#FFF59D
     classDef reporting fill:#E0F7FA,stroke:#80DEEA
+    classDef guest fill:#FFF3E0,stroke:#FFB74D
     classDef db fill:#ECEFF1,stroke:#B0BEC5
 
     %% ====== COMPONENTES PRINCIPALES ======
@@ -26,6 +27,11 @@ flowchart TD
     subgraph Auth["🔐 Auth Service"]
         AUTH_MS:::auth
         AUTH_DB[("Auth DB")]:::db
+    end
+
+    subgraph Guest["🧑‍💼 Guest Service"]
+        GUEST_MS:::guest
+        GUEST_DB[("Guest DB")]:::db
     end
 
     subgraph Room["🛏️ Room Service"]
@@ -56,24 +62,35 @@ flowchart TD
 
     %% Gateway → Microservicios
     GW -->|POST /auth/*| AUTH_MS
+    GW -->|GET /guests| GUEST_MS
     GW -->|GET /rooms| ROOM_MS
     GW -->|POST /bookings| BOOK_MS
+    GW -->|POST /payments| PAY_MS
 
     %% Booking Service
     BOOK_MS -->|Check availability| ROOM_MS
     BOOK_MS -->|Process payment| PAY_MS
     BOOK_MS -->|Send confirmation| NOTIF_MS
     BOOK_MS -->|Record metrics| REPORT_MS
+    BOOK_MS -->|Get guest| GUEST_MS
+
+    %% Guest Service
+    GUEST_MS -->|Verify guest| AUTH_MS
+
+    %% Payment Service
+    PAY_MS -->|Get booking| BOOK_MS
 
     %% Reporting
     REPORT_MS -->|Get bookings| BOOK_MS
     REPORT_MS -->|Get room data| ROOM_MS
+    REPORT_MS -->|Get payments| PAY_MS
 
     %% Notification
     NOTIF_MS -->|Get user details| AUTH_MS
 
     %% Bases de datos
     AUTH_MS --> AUTH_DB
+    GUEST_MS --> GUEST_DB
     ROOM_MS --> ROOM_DB
     BOOK_MS --> BOOK_DB
     PAY_MS --> PAY_DB
